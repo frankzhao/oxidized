@@ -4,6 +4,10 @@ class GithubRepo < Oxidized::Hook
   end
 
   def run_hook(ctx)
+    unless File.directory?(ctx.node.repo)
+      Rugged::Repository.clone_at(remote_repo(ctx.node), ctx.node.repo)
+    end
+    
     repo = Rugged::Repository.new(ctx.node.repo)
     log "Pushing local repository(#{repo.path})..."
     remote = repo.remotes['origin'] || repo.remotes.create('origin', remote_repo(ctx.node))
